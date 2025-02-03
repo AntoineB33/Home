@@ -1,3 +1,28 @@
-Library
-Logs
-proj.apk
+# Unity Generated Folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Bb]uild-*/ 
+[Bb]uilds-*/
+
+# Visual Studio / Rider Generated
+*.csproj
+*.unityproj
+*.sln
+*.user
+*.usertasks
+*.suo
+*.ntvs*
+*.njsproj
+*.sln.docstates
+*.pidb
+*.booproj
+
+# Unity Cache / Logs / Others
+[Uu]ser[Ss]ettings/
+MemoryCaptures/
+*.apk
+*.pem
+*.log
