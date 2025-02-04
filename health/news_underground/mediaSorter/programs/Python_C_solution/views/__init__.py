@@ -1,2 +1,1 @@
-from .main_ui import MainUI
-from .notifications import Notification
+from .spreadsheet_view import SpreadsheetView

@@ -1,2 +1,1 @@
-from .main_controller import on_key_press
-from .task_controller import TaskController
+from .main_controller import MainController

@@ -1,0 +1,575 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>TP CUDA basics</title>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="Stephane Vialle" name="author">
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta content="Programmation de base en CUDA d'un produit de matrices" name="description"></head><body style="background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);" alink="#000099" link="#000099" vlink="#990099">
+
+
+
+
+
+
+
+
+
+
+
+<h1 align="left"><img style="width: 240px; height: 120px;" alt="" src="pps-upsay.jpg"></h1>
+<h1 align="center">TP 1 : Programmation CUDA de base<br>
+</h1>
+
+<h2 style="text-align: center;">5ème année ingénieur de Polytech Paris-Sud</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p align="center"><a class="western" href="http://www.metz.supelec.fr/metz/personnel/vialle/Welcome.php" target="_blank"><span lang="fr-FR"><b>Stéphane
+Vialle</b></span></a><span lang="fr-FR">, CentraleSupélec &amp; LISN
+Stéphane.Vialle@centralesupelec.fr </span>&nbsp;  
+</p>
+
+
+<div style="text-align: center; background-color: white;"><div style="text-align: justify;">
+
+
+
+
+
+
+
+<h3 style="text-align: justify; background-color: white;">Objectifs du TP :</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="margin-left: 40px; text-align: justify; background-color: white;"><span style="font-style: italic;"></span>Ce TP a pour objectif de pratiquer la programmation d'un GPU&nbsp;au sein d'un noeud de calcul CPU+GPU : il consiste à
+implanter un premier produit de matrices denses sur un GPU. On développera différents "kernels", et <span style="color: rgb(0, 0, 0); font-family: 'Times New Roman'; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-align: justify; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium; display: inline ! important; float: none;">pour
+chacun on mesurera les performances d'un produit de matrices denses sur
+un&nbsp;GPU, en fonction de la granularité de la grille de blocs de
+threads. On étudiera la qualité de la "coalescence" de chaque version
+du kernel, pour identifier les solutions les plus intéressantes. Enfin,
+on
+comparera les performances obtenues sur GPU avec celle obtenues sur le
+CPU.</span><br>
+
+
+
+
+
+
+
+</div>
+<h3 class="western" style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;" align="justify"><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">Plate-forme
+de développement :&nbsp;</span></h3>
+
+<p style="margin-left: 0.42in;" align="justify"><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">Les
+machines utilisées seront celles des clusters Tx ou Cameron du DCE de
+CentraleSupélec :</span></p>
+
+<ul style="margin-left: 40px;">
+<li><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><span style="font-weight: bold;">Tx </span>: </span><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">chaque machine contient un CPU Intel XEON quad-core
+	hyperthreadés, et un GPU NVIDIA GTX-2080Ti (architecture Turing)</span></li><li><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"></span><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><b>Cameron</b>
+	:&nbsp;chaque machine contient un CPU Intel XEON hexa-core
+	hyperthreadés, et un GPU NVIDIA GTX-1080 (architecture Pascal)</span></li>
+</ul>
+
+<p style="margin-left: 0.42in;" align="left"><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">L'environnement
+CUDA C et C++ est disponible sur chaque machine (et donc le
+compilateur "<font face="Courier New, Courier, monospace"><font style="font-size: 10pt;" size="2"><b>nvcc</b></font></font>"
+et les drivers pour utiliser le GPU).<br>
+<br>
+Vous utiliserez les
+comptes de TP "<span style="color: rgb(51, 102, 255); font-weight: bold;">23ppsgpu_<span style="font-style: italic;">i</span></span>", où <span style="font-style: italic;">i </span>est une valeur entière
+entre <span style="color: rgb(51, 51, 255); font-weight: bold;">1</span> et <span style="font-weight: bold; color: rgb(51, 51, 255);">10</span>. <br>
+</span></p>
+
+<p style="margin-left: 0.42in; font-weight: bold;" align="left"><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">Depuis votre poste de travail en mode graphique avec <span style="font-style: italic;">dcejs</span> :</span></p>
+
+<ul>
+<ul style="list-style-type: disc;"><li><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">allocation de ressource : demandez 1 machine en mode exclusif (configuration par défaut)</span></li><li><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">action : démarrez VNC<br>
+      </span></li></ul>
+</ul>
+
+<p style="margin-left: 0.42in; font-weight: bold;" align="left"><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">OU BIEN depuis votre poste de travail en mode alphanumérique :</span></p>
+
+
+<ul>
+<ul style="list-style-type: disc;"><li><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">vous vous connecterez
+par <span style="font-weight: bold;">ssh</span> sur la machine <font style="font-weight: bold;" color="#ff0000">chome.metz.supelec.fr</font> en indiquant le login&nbsp;<span style="color: rgb(51, 51, 255);"></span></span><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><span style="color: rgb(51, 102, 255); font-weight: bold;">23ppsgpu_<span style="font-style: italic;">i</span></span></span></li></ul>
+</ul>
+<span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><span style="color: rgb(51, 102, 255); font-weight: bold;"><span style="font-style: italic;"></span></span></span>
+<ul>
+<ul style="list-style-type: disc;"><ul><li><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><span style="color: rgb(51, 102, 255);"><span style="color: black;">par l'éditeur <span style="font-weight: bold;">vscode</span> équipé du package "<span style="font-weight: bold;">remote development</span>" :</span> <a href="https://webtv.centralesupelec.fr/videos/how-to-connect-to-dce-with-visual-studio-code/" target="_blank">https://webtv.centralesupelec.fr/videos/how-to-connect-to-dce-with-visual-studio-code/</a></span></span></li></ul></ul>
+</ul>
+
+<span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><span style="color: rgb(51, 102, 255);"></span></span>
+<ul>
+<ul style="list-style-type: disc;"><ul><li><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><span style="color: rgb(51, 102, 255);"><span style="color: black;">par un simple terminal (<span style="font-weight: bold;">xterm</span> depuis Linux, ou <span style="font-weight: bold;">powershell</span> depuis Windows), puis en entrant la commande suivante :</span><br>
+        </span></span></li></ul></ul>
+</ul>
+
+
+<div style="margin-left: 120px;"><big style="font-family: Brush Script MT;"><big><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><font color="#ff0000"><small><small><span style="font-family: Times New Roman,Times,serif; color: black;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;"><big>ssh </big></span></span></small></small></font></span></big></big><big style="font-family: Brush Script MT; font-weight: bold; color: red;"><big><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><big>-l</big> </span></big></big><big style="font-family: Brush Script MT;"><big><big style="font-weight: bold; color: red;"><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><small><small><span style="font-family: Times New Roman,Times,serif;"><span style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(51, 51, 255);">23ppsgpu_<span style="font-style: italic;">i</span></span> <span style="color: rgb(51, 204, 0);">chome.metz.supelec.fr</span></span></span></small></small></span></big></big></big></div>
+<div style="margin-left: 80px;"><big style="font-family: Brush Script MT;"><big><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><font color="#ff0000"><small><small><span style="font-family: Times New Roman,Times,serif; color: black;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;"></span></span></small></small></font></span></big></big><big style="font-family: Brush Script MT; font-weight: bold; color: red;"><big><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"></span></big></big><big style="font-family: Brush Script MT;"><big><big style="font-weight: bold; color: red;"><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><small><small><span style="font-family: Times New Roman,Times,serif;"><span style="font-family: Courier New,Courier,monospace;"><span style="color: rgb(51, 204, 0);"></span></span></span></small></small></span></big></big></big></div>
+
+<div style="margin-left: 80px;">
+</div>
+
+<ul>
+<ul style="list-style-type: disc;"><li><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">une fois un terminal ouvert sur </span><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><font style="font-weight: bold;" color="#ff0000">chome.metz.supelec.fr </font></span><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">vous réserverez UN n&#339;ud sur le cluster à l'aide d'une commande slurm:<br>
+      </span></li></ul>
+</ul>
+
+
+<div style="margin-left: 80px;">
+<ol><li><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><span style="font-weight: bold;">Pendant le TP :</span> <big style="font-family: Courier New,Courier,monospace;"><span style="color: red; font-weight: bold;">srun</span></big></span><big style="font-family: Courier New,Courier,monospace;"><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; font-weight: bold;"><font color="#ff0000"> --reservation=XXX -N 1 --exclusive --pty bash</font></span></big></li></ol>
+<div style="margin-left: 80px;"><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: black;">--reservation=XXX : pré-</span><span style="color: black;">réservation de machines, de nom XXX (<span style="font-weight: bold;">demander ce nom à l'enseignant</span>)</span><br>
+-N 1 : UN noeud<br>
+--exclusive : être seul sur le noeud et pouvoir utiliser tous les coeurs CPU<br>
+--pty bash : lancer un shell (bash) pour une session interactive<br>
+</div>
+<br>
+<span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"></span>
+<ol start="2"><li><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><font color="#ff0000"><span style="color: black;"><span style="font-weight: bold;">Après le TP</span> (si besoin) : </span></font></span></li></ol>
+<ul style="margin-left: 40px;"><li><span style="font-weight: bold;">pour obtenir un noeud Tx</span> (GTX 2080 Ti): <span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: red; font-family: Courier New,Courier,monospace; font-weight: bold;">srun -p gpu_tp -C tx -N 1 --exclusive --pty bash</span></li><li><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><font color="#ff0000"><span style="color: black;"><span style="font-weight: bold;">pour obtenir un noeud Cameron</span> (GTX 1080) : </span></font></span><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial; color: red; font-family: Courier New,Courier,monospace; font-weight: bold;">srun -p gpu_tp -C cam -N 1 --exclusive --pty bash</span></li></ul>
+</div>
+<span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><span style="font-weight: bold;"></span></span>
+<h3><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;">Travail à effectuer :</span></h3>
+<div style="margin-left: 40px; text-align: justify; background-color: white;"><span style="font-weight: bold;">Remarques préliminaires :</span> <br>
+
+
+
+
+
+
+
+
+
+
+
+</div><div style="margin-left: 40px; text-align: justify; background-color: white;"><ul><li style="color: black;">Le squelette de programme que vous utiliserez contient un code de produit de matrices denses en&nbsp;OpenMP et&nbsp;CUDA.</li><li style="color: black;">La
+partie&nbsp;OpenMP est complète, et <span style="font-weight: bold;">est destinée à permettre de vérifier les résultats obtenus en&nbsp;CUDA</span>.</li><li style="color: black;">La partie&nbsp;CUDA est en partie développée, mais il vous reste à compléter le fichier <span style="font-family: Courier New,Courier,monospace; font-weight: bold; color: red;">gpu.cu</span> :</li><ul></ul></ul><ul><li style="color: rgb(255, 0, 0); font-weight: bold;"><span style="font-weight: normal; color: red;"><span style="font-weight: bold;">Le squelette est compilable et contient une aide intégrée : exécutez 'make' puis './MatrixProduct -h'.</span></span></li></ul><ul><li style="color: rgb(255, 0, 0); font-weight: bold;"><span style="font-weight: normal; color: red;"><span style="font-weight: bold;">Pour valider votre premier code</span> vous compilerez en Double Précision </span><span style="font-weight: normal; color: red;">(le type "T_real" devient le type "double")&nbsp; avec</span><span style="font-weight: normal; color: red;"> "-DDP" dans le Makefile, les résultats seront identiques sur CPU et sur GPU, mais les performances des GPU
+s'effondreront <span style="color: black;">(car il s'agit de cartes GPU grand public non adaptées à la Double Précision).</span> <br>
+    </span></li></ul><span style="font-weight: normal; color: red;"></span><span style="font-weight: normal; color: red;"></span>
+<ul>
+  <li style="color: rgb(255, 0, 0); font-weight: bold;"><span style="font-weight: normal; color: red;"><span style="font-weight: bold;">Pour
+faire vos mesures de performances</span> vous compilerez en Simple Précision
+(le type "T_real" devient le type "float") avec "#-DDP" dans le
+Makefile. <span style="color: black;">La simple précision est adaptée
+aux capacités des GeForce GTX1080 et RTX2080, mais il se peut que vous observiez des
+différences entre les calculs sur CPU et sur GPU!!</span></span></li>
+</ul>
+<span style="font-weight: normal; color: red;"></span>
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="margin-left: 40px;"><span style="font-weight: bold;"></span><span style="font-weight: bold; color: rgb(102, 51, 255);">1 - Implantation d'une grille "2D" de blocs "1D" et du kernel K0 :</span>
+<ol start="1" style="list-style-type: lower-alpha;">
+
+  <li><span style="font-weight: bold;">Récupérez et compilez le squelette de programme</span>&nbsp;OpenMP+CUDA. <br>
+</li>
+  
+  <ul>
+
+    <li><a style="font-weight: bold;" href="MatrixProduct-CUDA-basics-enonce-1.zip">Squelette</a>, ou bien allez le recopier sur votre compte de TP par la commande :&nbsp;<small style="color: red;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;"></span></small></li><span style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">  </span></span>
+  </ul>
+</ol>
+</div>
+<div style="margin-left: 120px; font-family: Courier New;"><font style="font-size: 12pt;" size="3"><span style="background: rgb(255, 255, 255) none repeat scroll 0% 50%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial;"><font color="#ff0000"><b>cp
+	~vialle/PPS-GPU/</b></font><font color="#ff0000"><b>MatrixProduct-CUDA-basics-enonce-1</b></font><font color="#ff0000"><b>.zip</b></font><span style="font-weight: bold;"> <big><span style="color: red;">.</span></big></span></span></font></div>
+<div style="margin-left: 40px;">
+<ol start="1" style="list-style-type: lower-alpha;">
+  <ul>
+
+    <li><small style="color: red;"><span style="font-family: Courier New,Courier,monospace; font-weight: bold;"></span></small>Compilez ce squelette et testez son fonctionnement sur CPU (exécutez la commande <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">./MatrixProduct -h</span></small>
+pour voir les détails de fonctionnement de l'application).</li>
+  
+  </ul>
+
+
+  
+</ol>
+<span style="font-weight: bold;"></span><ol style="list-style-type: lower-alpha;" start="2"><li><span style="font-weight: bold;">Dans le fichier '</span><span style="color: red; font-weight: bold;">gpu.cu</span><span style="font-weight: bold;">' complétez les routines de transferts de données</span> : '<small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">gpuSetDataOnGPU' </span><big><span style="font-family: Times New Roman,Times,serif;">et</span></big><span style="font-weight: bold;"> 'gpuGetResultOnCPU.</span></small><br>
+</li>
+  <ul>
+    <li>Vous devez&nbsp;compléter ces routines avec des appels à '<small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">cudaMemcpyFromSymbol</span></small>' et '<small style="font-family: Courier New,Courier,monospace;"><span style="font-weight: bold;">cudaMemcpyToSymbol</span></small>'.</li>
+    <li>Compilez et exécutez votre code : vérifiez qu'il ne signale pas d'erreur.<br>
+    </li>
+  </ul>
+</ol>
+<ol start="3" style="list-style-type: lower-alpha;">
+<li><span style="font-weight: bold;">Implantez le kernel K0 et sa grille de blocs de threads</span> <span style="font-weight: bold;">dans le fichier '</span><span style="color: red; font-weight: bold;">gpu.cu</span><span style="font-weight: bold;">' </span>pour que :</li>
+  <ul>
+    <li>chaque thread calcule un élément complet de la matrice C = AxB,</li>
+    <li>un bloc de threads soit un segment 1D selon la dimension X,</li>
+    <li>un bloc de threads calcule les éléméments successifs d'une partie d'une ligne de C (<span style="font-style: italic;">les colonnes de C doivent être
+associées à la dimension X des blocs</span>),</li>
+    <li> les lignes successives de C seront traitées par des blocs 1D différents (<span style="font-style: italic;">les lignes de C doivent être associées à la dimension Y des blocs</span>).</li>
+  </ul>
+</ol>
+<div style="margin-left: 40px;">
+<ul style="list-style-type: circle;">
+  <li>Testez
+votre implantation&nbsp;sur une matrice de
+    <span style="color: rgb(51, 51, 255);">1024x1024</span> <span style="font-weight: bold; color: rgb(51, 51, 255);">DOUBLE</span> (option -DDP active dans le '<span style="color: red; font-weight: bold;">Makefile</span>' et changement de SIZE dans le '<span style="font-weight: bold; color: red;">main.h</span>'), et vérifiez que vous obtenez les mêmes valeurs que sur
+CPU (<small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">MatrixProduct -t CPU -cpu-k 1 -cpu-nt 4</span></small>, sur Tx, et <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">-cpu-nt 6</span></small> sur Cameron)</li>
+</ul>
+<ul style="list-style-type: circle;">
+  <li>Testez votre implantation <span style="color: red;"><span style="color: black;">sur une matrice de </span><span style="font-weight: bold; color: rgb(204, 102, 204);">1025x1025</span></span><span style="font-weight: bold; color: rgb(204, 102, 204);">DOUBLE</span> (vérifiez que vous obtenez les mêmes valeurs que sur
+CPU).</li>
+</ul>
+</div><ol start="5" style="list-style-type: lower-alpha;"><li><span style="font-weight: bold;">Mesurez les performances du kernel 0 obtenues sur une matrice de</span> <span style="font-weight: bold; color: red;">4096x4096</span><span style="color: red;"> </span><span style="font-weight: bold; color: red;">FLOAT</span> éléments (#-DDP dans le Makefile).<br></li></ol><div style="margin-left: 40px;">
+<ul style="list-style-type: circle;">
+  <li>Récupérez le <a style="font-weight: bold;" href="CudaPerf.xlsx">fichier Excel</a> de saisi des résultats, et complétez-le au fur et à mesure du TP.</li></ul>
+<ul style="list-style-type: circle;">
+  <li>Faites
+varier la taille de vos blocs 1D de threads, et mesurer les
+performances obtenues pour des blocs de 32 à 1024 threads. </li>
+
+  
+  <li>Puis faites varier la taille des blocs de 32 à 1 thread.</li>
+</ul>
+<ul style="list-style-type: circle;">
+  <li><span style="font-weight: bold;">Est-ce que la courbe de performance obtenue semble conforme à la théorie ? pourquoi ?</span></li>
+</ul>
+
+</div>
+<ol start="6" style="list-style-type: lower-alpha;">
+  <li><span style="font-weight: bold;">Comparez aux meilleures performances obtenues sur CPU multi-coeurs</span> en OpenMP avec un kernel de même niveau (kernel 0),&nbsp; <small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;"></span></small><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;"></span></small></li>
+</ol>
+<div style="margin-left: 40px;">
+<ul style="list-style-type: circle;">
+  <li><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">MatrixProduct -t CPU -cpu-k 0 -cpu-nt 8 </span></small>sur Tx</li>
+  <li><small><span style="font-family: Courier New,Courier,monospace; font-weight: bold;">MatrixProduct -t CPU -cpu-k 0 -cpu-nt 12 </span></small>sur Cameron</li>
+</ul>
+<ul style="list-style-type: circle;">
+  <li>Calculez le speedup GPU <span style="font-style: italic;">vs</span> CPU.</li>
+</ul>
+
+</div>
+</div>
+
+<div style="margin-left: 40px;">
+<span style="font-weight: bold;"></span><span style="font-weight: bold;"></span><span style="font-weight: bold;"><span style="color: rgb(102, 51, 255);">2 - Etude de la coalescence du kernel K0 :</span><br>
+
+</span>
+<br>
+<div style="margin-left: 40px;">Rappel : le kernel K0 se déploie avec
+des blocs 1D selon l'axe X, où chaque bloc traite des colonnes
+successives d'une même ligne de C. <br>
+</div>
+<ol start="1" style="list-style-type: lower-alpha;">
+  
+  <li><span style="font-weight: bold;">Etudier la "coalescence" :</span><br>
+
+  </li>
+  <ul>
+    <li>des lectures de A,</li>
+    <li>des lectures de B,</li>
+    <li>des écritures dans C</li>
+  </ul>
+
+</ol>
+
+<ol start="2" style="list-style-type: lower-alpha; font-weight: bold;">
+  <li>Que serait devenu la coalescence :</li>
+  <ul>
+    <li style="font-weight: normal;">en utilisant la transposée de A ? </li>
+    <li style="font-weight: normal;">en utilisant la transposée de B ? </li>
+  </ul>
+</ol>
+<ol start="2" style="list-style-type: lower-alpha; font-weight: bold;">
+
+</ol>
+
+<ol start="3" style="list-style-type: lower-alpha;">
+  <li><span style="font-weight: bold;">On considère maintenant des blocs 1D selon l'axe X, MAIS où chaque bloc traite des lignes successives d'une même colonne de C.</span> <br>
+</li>
+  <ul>
+    <li>Etudier à nouveau la coalescence obtenue lors des lectures de A ou de
+la transposée de A, <br>
+    </li>
+    <li>et lors la lecture de B ou de la transposée de B, <br>
+    </li>
+    <li>et lors des écritures de
+C.</li>
+  </ul>
+
+</ol>
+<ol start="4" style="list-style-type: lower-alpha;">
+  <li><span style="font-weight: bold;">Quelle est la meilleure solution ?</span></li>
+</ol>
+<ol start="5" style="list-style-type: lower-alpha;">
+  <li><span style="font-weight: bold;">Echangez le calcul des numéros de ligne et de colonne traitées
+par chaque thread</span>, pour vous mettre dans le cas où un bloc 1D en X
+traite des lignes successives d'une même colonne de C. <br>
+</li>
+  <ul>
+    <li>Mesurez les
+performances obtenues.<span style="font-weight: bold;"> <br>
+</span></li>
+    <li><span style="font-weight: bold;">L'évolution des performances est-elle conforme aux prévisions ?</span><br>
+  </li>
+  </ul>
+
+</ol><span style="color: rgb(102, 51, 255);">&nbsp;
+</span><span style="font-weight: bold; color: rgb(102, 51, 255);">3- Implantation d'une grille "2D" de blocs "2D" et du kernel K1 :</span>
+<ol style="list-style-type: lower-alpha; background-color: white;">
+  <li><span style="font-weight: bold;">Créez
+le kernel K1 en&nbsp;généralisant votre kernel K0 (et sa grille de
+blocs) pour qu'il supporte des blocs 2D (rectangulaires) de threads.</span>&nbsp;</li>
+</ol><div style="margin-left: 40px;">
+<ul style="list-style-type: circle;">
+  <li>Testez
+et validez votre implantation&nbsp;sur une matrice de
+    <span style="color: rgb(51, 51, 255);">1024x1024</span> <span style="color: rgb(51, 51, 255);">FLOAT</span> <span style="font-style: italic;">: vérifiez que vous obtenez les mêmes valeurs qu'avec le kernel K0</span>.</li>
+  <li>Puis sur une matrice de&nbsp;<span style="color: rgb(204, 102, 204);">1025x1025 FLOAT</span>.<span style="font-style: italic;"></span><br>
+  </li>
+</ul>
+<div style="margin-left: 40px;"><span style="color: red;">Attention : la taille maximale d'un bloc est de 1024 threads !</span></div>
+ </div><ol start="2" style="list-style-type: lower-alpha; background-color: white;"><li><span style="font-weight: bold;">Mesurez les performances obtenues sur une matrice de</span> <span style="font-weight: bold; color: red;">4096x4096</span> <span style="font-weight: bold; color: red;">FLOAT</span><span style="color: red;">.</span></li></ol><div style="margin-left: 40px;">
+<ul style="list-style-type: circle;">
+  <li>Mesurez
+les performances obtenues avec des blocs "XxY" pour des tailles
+correspondant aux cases jaunes du fichier Excel.</li>
+</ul>
+<div style="margin-left: 40px; font-style: italic;">Notamment pour des
+tailles XxY de 8x8, 16x16, 32x32, puis de 32x8, 8x32, et 32x16 et 16x32
+threads.</div>
+</div>
+<ol start="3" style="list-style-type: lower-alpha;">
+  <li style="background-color: white;"><span style="font-weight: bold;">Comparez les performances du kernel K1 avec :</span></li>
+  <ul>
+    <li style="background-color: white;">les meilleures performances sur <span style="color: rgb(51, 51, 255);">GPU</span> du kernel <span style="color: rgb(51, 51, 255);">K0</span>,<br>
+    </li>
+    <li style="background-color: white;">les meilleures performances obtenues sur <span style="color: red;">CPU</span> multi-coeurs en OpenMP kernel <span style="color: red;">K0<span style="color: black;"> (le K1 sur CPU est l'équivalent des K4-J7 sur GPU)</span></span>,</li>
+    <li style="background-color: white;">calculez le speedup GPU <span style="font-style: italic;">vs</span> CPU.</li>
+  </ul>
+</ol>
+<ol start="4" style="list-style-type: lower-alpha;">
+  <li style="background-color: white;"><span style="font-weight: bold;">La coalescence est-t-elle toujours respectée (justifiez votre réponse) ?</span><br>
+  </li>
+
+</ol>
+
+</div>
+
+<hr style="width: 100%; height: 2px;"><br>
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+ </div>
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

@@ -1,0 +1,3 @@
+requirements.txt :
+le fichier : pipreqs . --force
+les librairies : python -m pip install -r requirements.txt

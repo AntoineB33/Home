@@ -1,23 +1,31 @@
-from datetime import datetime
-from models.time_manager import TIME_RECORDS_FILE
-import os
+import sys
+from PyQt5.QtWidgets import QApplication
 
-def on_key_press(event):
-    """Handles keyboard shortcuts."""
-    match event.char:
-        case "s":
-            with open(TIME_RECORDS_FILE, 'a') as f:
-                f.write(f"\nstart : {datetime.now()}\n")
-        case "e":
-            with open(TIME_RECORDS_FILE, 'r+') as f:
-                lines = f.readlines()
-                for i in range(len(lines) -1, 0, -1):
-                    try:
-                        start = datetime.strptime(lines[i].split(" : ")[1], "%Y-%m-%d %H:%M:%S.%df")
-                        lines[i] = f"duration : {datetime.now() - start}"
-                        f.seek(0)
-                        f.writelines(lines)
-                        f.truncate()
-                        break
-                    except:
-                        print("no start time")
+from data.table_storage import TableStorage
+from models.infinite_table_model import InfiniteTableModel
+from views.spreadsheet_view import SpreadsheetView
+
+class MainController:
+    """
+    The 'Controller' in MVC, tying together the model(s) and view(s).
+    """
+    def __init__(self):
+        # Create the application instance
+        self.app = QApplication(sys.argv)
+
+        # Create our data storage
+        self.storage = TableStorage()
+
+        # Create the model, passing in our storage
+        self.model = InfiniteTableModel(self.storage)
+
+        # Create the view (the table widget)
+        self.view = SpreadsheetView()
+        self.view.setModel(self.model)
+
+    def run(self):
+        """
+        Show the view and start the Qt event loop.
+        """
+        self.view.show()
+        return self.app.exec_()
