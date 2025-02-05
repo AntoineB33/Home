@@ -63,13 +63,13 @@
 // Testez votre classe avec le code suivant :
 // 
 //      int main() {
-//        small_array < int , 1000 * 1000 * 10 > t ;
+//        small_array < int , N > t ;
 //        t[2] = 42;
 //      }
 // 
 // Question : pourquoi le programme plante-t-il ?
 // 
-//      Parce que le tableau est trop grand pour être alloué sur la pile, ce qui provoque un débordement de pile (stack overflow).
+//      En enlevant -O3 des paramètres de compilation, le programme plante car le tableau est trop grand pour être alloué sur la pile, ce qui provoque un débordement de pile (stack overflow).
 // 
 // Définissez une classe template `large_array<T,N> `dont le champ privé a maintenant le type suivant :
 // `std::unique_ptr < small_array <T ,N > >`.
@@ -78,12 +78,12 @@
 // 
 // Question : pourquoi le constructeur par défaut fourni par le compilateur ne convient-il pas ?
 // 
-//      REPONDRE ICI
+//      Parce que le constructeur par défaut du compilateur ne peut pas initialiser correctement le std::unique_ptr avec un nouvel objet small_array.
 // 
 // Définissez un constructeur par défaut et testez votre classe avec le code suivant :
 //   
 //      int main() {
-//        large_array < int , 1000 * 1000 * 10 > t ;
+//        large_array < int , N > t ;
 //        t [2] = 42;
 //      }
 // 
@@ -103,7 +103,7 @@
 // 
 // Question : quel est l’inconvénient de cette variante ?
 // 
-//      REPONDRE ICI
+//      L'inconvénient est qu'elle nécessite une allocation temporaire, ce qui peut être coûteux en termes de performance et de mémoire.
 // 
 // Une fonction template incorrecte n’est généralement pas détectée par le compilateur tant qu’elle n’est
 // pas utilisée par du code non-template. Modifiez le code de test afin que l’opérateur d’affectation par
@@ -120,13 +120,12 @@
 // une assertion dans le constructeur de `large_array` pour s’assurer qu’il n’est pas appelé avec un petit `N`.
 // 
 //      int main() {
-//        my_array < int , 1000 * 1000 * 10 > t ;
+//        my_array < int , N > t ;
 //        t [2] = 42;
 //      }
 // 
 
 #include <iostream>
-
 #include <cassert>
 #include <stdexcept>
 #include <memory>
@@ -178,7 +177,7 @@ public:
     }
 };
 
-template <typename T, std::size_t N>
+template < typename T , std :: size_t N >
 class large_array {
 private:
     std::unique_ptr<small_array<T, N>> data;
@@ -235,25 +234,27 @@ public:
         data.swap(other.data);
     }
 };
-/*
-template < typename T , std :: size_t N >
-class large_array {
-  // CODE A AJOUTER ICI
-};
-
 template <typename T, std::size_t N>
-using my_array = // CODE A AJOUTER ICI
-*/
-int main() {
+using my_array = std::conditional_t<(sizeof(T) * N <= 16), small_array<T, N>, large_array<T, N>>;
 
-    small_array < int , 1000 * 1000 * 10 > t ;
-    // small_array < int , 4 > t;
+int main() {
+    std::size_t const n = 4;
+    std::size_t const N = 1000 * 1000 * 10;
+    // std::size_t const n = N;
+
+    // small_array < int , N > t ;
+    my_array < int , n > t;
     t[2] = 42;
-    small_array < int , 4 > const u = t ;
+    my_array < int , n > tc(t);
+    my_array<int, n> td = std::move(t);
+    my_array < int , n > const u = t ;
     for ( std :: size_t i = 0; i < 4; ++ i ) {
+        std::cout << "[ " << i << " ] = " << t [ i ] << "\n ";
         std::cout << "[ " << i << " ] = " << u [ i ] << "\n ";
+        std::cout << "[ " << i << " ] = " << tc [ i ] << "\n ";
+        std::cout << "[ " << i << " ] = " << td [ i ] << "\n ";
     }
-    t[4] = 0; // assertion failed !
+    // t[n] = 0; // assertion failed !
 
     // Test de la méthode at avec un accès valide
     try {
@@ -264,7 +265,7 @@ int main() {
 
     // Test de la méthode at avec un accès hors des bornes
     // try {
-    //     std::cout << "t.at(4) = " << t.at(4) << '\n'; // Accès hors des bornes
+    //     std::cout << "t.at(n) = " << t.at(n) << '\n'; // Accès hors des bornes
     // } catch (const std::out_of_range& e) {
     //     std::cerr << "Exception: " << e.what() << '\n';
     // }
@@ -278,10 +279,63 @@ int main() {
 
     // Test de la méthode at avec un accès hors des bornes sur un tableau constant
     // try {
-    //     std::cout << "u.at(4) = " << u.at(4) << '\n'; // Accès hors des bornes
+    //     std::cout << "u.at(n) = " << u.at(n) << '\n'; // Accès hors des bornes
     // } catch (const std::out_of_range& e) {
     //     std::cerr << "Exception: " << e.what() << '\n';
     // }
+
+
+    my_array < int , N > t2 ;
+    t2[2] = 42;
+    my_array < int , N > t2c(t2);
+    my_array<int, N> t2d = std::move(t2);
+    /*my_array < int , N > const u2 = t2 ;
+    for ( std :: size_t i = 0; i < 4; ++ i ) {
+        std::cout << "[ " << i << " ] = " << t2 [ i ] << "\n ";
+        std::cout << "[ " << i << " ] = " << u2 [ i ] << "\n ";
+        std::cout << "[ " << i << " ] = " << t2c [ i ] << "\n ";
+        std::cout << "[ " << i << " ] = " << t2d [ i ] << "\n ";
+    }
+    // t2[N] = 0; // assertion failed !
+
+    // Test de la méthode at avec un accès valide
+    try {
+        std::cout << "t2.at(2) = " << t2.at(2) << '\n'; // Accès valide
+    } catch (const std::out_of_range& e) {
+        std::cerr << "Exception: " << e.what() << '\n';
+    }
+
+    // Test de la méthode at avec un accès hors des bornes
+    // try {
+    //     std::cout << "t2.at(N) = " << t2.at(N) << '\n'; // Accès hors des bornes
+    // } catch (const std::out_of_range& e) {
+    //     std::cerr << "Exception: " << e.what() << '\n';
+    // }
+
+    // Test de la méthode at avec un tableau constant
+    try {
+        std::cout << "u2.at(2) = " << u2.at(2) << '\n'; // Accès valide
+    } catch (const std::out_of_range& e) {
+        std::cerr << "Exception: " << e.what() << '\n';
+    }
+
+    // Test de la méthode at avec un accès hors des bornes sur un tableau constant
+    // try {
+    //     std::cout << "u2.at(N) = " << u2.at(N) << '\n'; // Accès hors des bornes
+    // } catch (const std::out_of_range& e) {
+    //     std::cerr << "Exception: " << e.what() << '\n';
+    // }
+
+
+    // Test de la méthode swap entre t2 et t3
+    my_array < int , N > t3 ;
+    t3[2] = 42;
+    t2.swap(t3);
+    for ( std :: size_t i = 0; i < 4; ++ i ) {
+        std::cout << "[ " << i << " ] = " << t2 [ i ] << "\n ";
+        std::cout << "[ " << i << " ] = " << t3 [ i ] << "\n ";
+    }*/
+
 
     return 0;
 }
