@@ -1,0 +1,4 @@
+Oui, il est fort probable que, lors de l’utilisation du constructeur par défaut, les cases non initialisées contiennent des valeurs "surprenantes" (ou des "garbage values").
+
+    En effet, dans la classe small_array, le tableau T[N] n’est pas initialisé par défaut.
+    Pour des types primitifs comme int, cela signifie que les cases du tableau possèdent des valeurs indéterminées, ce qui est normal en C++ lorsque l’on n’effectue pas d’initialisation explicite.

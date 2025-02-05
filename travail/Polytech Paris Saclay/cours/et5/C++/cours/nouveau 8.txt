@@ -1,0 +1,14 @@
+if constexpr(std::same_as(
+
+
+
+[]<typename T>(T e){
+}
+
+
+
+std::variant<circle, double> 
+
+
+void f(int&& i) {}
+void h(int&& i) {std::cout<<"!!"; f(std::move(i))}

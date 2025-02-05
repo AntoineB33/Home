@@ -1,0 +1,1 @@
+-O3 --std=c++23 -f stop-on-first-error
