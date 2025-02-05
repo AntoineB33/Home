@@ -1,3 +1,6 @@
 [submodule "travail/Polytech Paris Saclay/cours/et5/AGL/code/Projet_Genie_Logiciel"]
 	path = travail/Polytech Paris Saclay/cours/et5/AGL/code/Projet_Genie_Logiciel
 	url = https://github.com/AntoineB33/Home.git
+[submodule "health/news_underground/mediaSorter/programs/c_prog/CustomVideoPlayer"]
+	path = health/news_underground/mediaSorter/programs/c_prog/CustomVideoPlayer
+	url = https://github.com/AntoineB33/CustomVideoPlayer.git
