@@ -1,0 +1,13 @@
+antoine.barbault@gmail.com
+eeeeee&1
+
+
+
+
+
+1 ère démo:
+Inscription d'un utilisateur avec des données réelles
+Déconnexion du profile, ensuite reconnexion à ce dernier
+Montrer le Scan de la partie utilisateur connecté, faire avec un déchet qui fonctionne et un autre non reconnu
+Montrer la même fonctionnalité mais dans le mode invité
+Montrer le Quiz de fin de semaine et bien préciser que la fonctionnalité n'est pas totalement finaliser

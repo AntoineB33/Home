@@ -9,5 +9,5 @@ EditorBuildSettings:
     path: Assets/Scenes/sewer_room.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   m_configObjects:
-    Unity.XR.PXR.Settings: {fileID: 11400000, guid: ac4d59016706c16449952aa7a874ad7e, type: 2}
-    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: cea0f54beffaab84fb05f0a34649893b, type: 2}
+    Unity.XR.PXR.Settings: {fileID: 11400000, guid: efdd7950f69f32a40a8b79b73b6d40d1, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: d08fbc73679677d42a617225dcdd0a38, type: 2}
