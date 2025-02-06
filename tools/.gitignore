@@ -3,4 +3,6 @@
 !code_tips/**
 !debug/
 !debug/**
+!data_management/
+!data_management/**
 !.gitignore

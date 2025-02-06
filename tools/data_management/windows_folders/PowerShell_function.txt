@@ -1,0 +1,41 @@
+function Show-Tree {
+    param (
+        [string]$Path = ".",
+        [int]$Depth = 2
+    )
+
+    # Function to get the indentation level
+    function Get-Indentation {
+        param ($level)
+        return " " * ($level * 4)
+    }
+
+    # Function to recursively display the folder structure
+    function Show-TreeRecursive {
+        param ($currentPath, $currentLevel)
+        
+        # Get items in the current folder
+        $items = Get-ChildItem -Path $currentPath
+
+        foreach ($item in $items) {
+            $indent = Get-Indentation $currentLevel
+            $name = $item.Name
+            if ($item.PSIsContainer) {
+                # If it's a directory, display it and recurse into it
+                Write-Host "$indent|-- $name"
+                if ($currentLevel -lt $Depth) {
+                    Show-TreeRecursive -currentPath $item.FullName -currentLevel ($currentLevel + 1)
+                }
+            } else {
+                # If it's a file, display it
+                Write-Host "$indent|-- $name"
+            }
+        }
+    }
+
+    # Start the recursive display from the root path
+    Show-TreeRecursive -currentPath $Path -currentLevel 0
+}
+
+# Run the function with the desired path and depth
+Show-Tree -Path "C:\Users\abarb\Documents\travail\Polytech Paris Saclay\cours\et5\rvi\projet\env3d_interm\Assets" -Depth 2
