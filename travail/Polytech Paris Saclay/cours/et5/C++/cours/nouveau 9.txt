@@ -1,0 +1,12 @@
+instantiable : qu'on construit (pas les références, fonctions, types abstraits...)
+
+char + char : int 
+donc char n'est plus arithmétique avec :
+1 template<typename T>
+2 concept arithmetic = requires(T a, T b)
+3 {
+4 { a + b }  stdsame_as<T>;
+5 { a - b }  stdsame_as<T>;
+6 { a * b }  stdsame_as<T>;
+7 { a / b }  stdsame_as<T>;
+8 };
