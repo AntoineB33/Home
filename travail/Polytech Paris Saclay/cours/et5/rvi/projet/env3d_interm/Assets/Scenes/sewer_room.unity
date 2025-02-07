@@ -3212,7 +3212,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b957865bc627b244a97959ac15d69811, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  proximityThreshold: 10
+  proximityThreshold: 1000
   collisionLayer:
     serializedVersion: 2
     m_Bits: 4294967295

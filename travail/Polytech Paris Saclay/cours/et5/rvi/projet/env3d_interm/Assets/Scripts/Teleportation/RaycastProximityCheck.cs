@@ -3,7 +3,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class RaycastProximityCheck : MonoBehaviour
 {
-    public float proximityThreshold = 1000f;  // Adjust the proximity value
+    public float proximityThreshold = 3f;  // Adjust the proximity value
     public LayerMask collisionLayer;
 
     private XRRayInteractor rayInteractor;
