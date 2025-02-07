@@ -3,7 +3,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class RaycastProximityCheck : MonoBehaviour
 {
-    public float proximityThreshold = 10f;  // Adjust the proximity value
+    public float proximityThreshold = 1000f;  // Adjust the proximity value
     public LayerMask collisionLayer;
 
     private XRRayInteractor rayInteractor;
@@ -20,6 +20,9 @@ public class RaycastProximityCheck : MonoBehaviour
         // Access the ray's origin directly from the transform of the XRRayInteractor
         Vector3 rayOrigin = rayInteractor.transform.position;
         Vector3 rayDirection = rayInteractor.transform.forward;
+
+        Debug.Log("Raycast" + Physics.Raycast(rayOrigin, rayDirection, out hitInfo, rayInteractor.maxRaycastDistance, collisionLayer));
+        Debug.Log("Time : " + Time.time);
 
         // Perform a raycast to check if we are close to a collider
         if (Physics.Raycast(rayOrigin, rayDirection, out hitInfo, rayInteractor.maxRaycastDistance, collisionLayer))

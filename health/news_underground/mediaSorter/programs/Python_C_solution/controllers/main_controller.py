@@ -14,12 +14,11 @@ class MainController:
     """
     def __init__(self, collection_filename):
         self.app = QApplication(sys.argv)
-        # Create the data storage using the provided collection filename.
         self.storage = TableStorage(collection_filename)
         self.model = InfiniteTableModel(self.storage)
         self.view = SpreadsheetView()
         self.view.setModel(self.model)
-        self.floating_panel = FloatingButtonPanel(self.view)
+        self.floating_panel = FloatingButtonPanel(self.view, self.model)
         self._position_floating_panel()
 
     def _position_floating_panel(self):
