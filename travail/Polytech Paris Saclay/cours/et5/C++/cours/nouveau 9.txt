@@ -10,3 +10,7 @@ donc char n'est plus arithmétique avec :
 6 { a * b }  stdsame_as<T>;
 7 { a / b }  stdsame_as<T>;
 8 };
+
+
+
+erreur dans le processus de substitution : fait disparaître la fonction
