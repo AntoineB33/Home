@@ -129,7 +129,8 @@ static_assert(largest(test_tl) == 19);
 //==============================================================================
 
 template<typename T, typename... Types>
-constexpr auto all_of(type_list<Types...>) {
+constexpr auto all_of(type_list<Types...>)
+{
     return (std::is_same_v<T, Types> && ...);
 }
 
@@ -146,7 +147,8 @@ static_assert(!all_of<int>(type_list<int,int,int,void,int>{}));
 //==============================================================================
 
 template<typename T, typename... Types>
-constexpr auto any_of(type_list<Types...>) {
+constexpr auto any_of(type_list<Types...>)
+{
     return (std::is_same_v<T, Types> || ...);
 }
 
@@ -163,7 +165,8 @@ static_assert( any_of<int>(type_list<void,void,void,void,int>{}));
 //==============================================================================
 
 template<typename T, typename... Types>
-constexpr auto none_of(type_list<Types...>) {
+constexpr auto none_of(type_list<Types...>)
+{
     return !(std::is_same_v<T, Types> || ...);
 }
 
@@ -181,7 +184,8 @@ static_assert(!none_of<int>(type_list<void,void,void,void,int>{}));
 //==============================================================================
 
 template<typename T, typename... Types>
-constexpr std::ptrdiff_t find(type_list<Types...>) {
+constexpr std::ptrdiff_t find(type_list<Types...>)
+{
     constexpr std::ptrdiff_t indices[] = { (std::is_same_v<T, Types> ? 1 : 0)... };
 
     for (std::ptrdiff_t i = 0; i < sizeof...(Types); ++i) {
@@ -205,9 +209,23 @@ static_assert(find<void***>(test_tl) == -1);
 //==============================================================================
 
 template<typename... Types>
-constexpr auto largest_index(type_list<Types...>) {
-    return std::max_element({sizeof(Types)...}, [](auto a, auto b) { return a < b; }) - &sizeof(Types)...;
+constexpr std::ptrdiff_t largest_index(type_list<Types...>)
+{
+    constexpr std::size_t sizes[] = {sizeof(Types)...};
+
+    std::ptrdiff_t max_index = -1;
+    std::size_t max_size = 0;
+
+    for (std::ptrdiff_t i = 0; i < sizeof...(Types); ++i) {
+        if (sizes[i] > max_size) {
+            max_size = sizes[i];
+            max_index = i;
+        }
+    }
+
+    return max_index;
 }
+
 
 
 static_assert(largest_index(null_tl) == -1);
@@ -221,13 +239,21 @@ static_assert(largest_index(test_tl) ==  2);
 //==============================================================================
 
 template<typename T1, typename... T2>
-constexpr auto unroll(type_list<T1>, type_list<T2...>) {
-    return type_list<T1, T2...>{};
+constexpr auto unroll(type_list<T1>, type_list<T2...>)
+{
+    return type_list<type_list<T1, T2>...>{};
 }
 
+constexpr type_list<int> i1;
+constexpr type_list<float,double> fd;
+constexpr type_list<type_list<int,float>,type_list<int,double>> ifd;
+
+static_assert( unroll(i1,fd) == ifd );
+
 template<typename... T1, typename... T2>
-constexpr auto cartesian_product(type_list<T1...>, type_list<T2...>) {
-    return (unroll(type_list<T1>{}, type_list<T2>{}) + ...);
+constexpr auto cartesian_product(type_list<T1...>, type_list<T2...>)
+{
+    return (unroll(type_list<T1>{}, type_list<T2...>{}) + ...);
 }
 
 constexpr type_list<int[1],int[2],int[3]> i123; 
@@ -245,7 +271,8 @@ static_assert( cartesian_product(i123,f123) == cpif);
 //==============================================================================
 
 template<typename... Types>
-constexpr auto to_tuple(type_list<Types...>) {
+constexpr auto to_tuple(type_list<Types...>)
+{
     return std::tuple<Types...>{};
 }
 
@@ -264,8 +291,6 @@ static_assert( std::is_same_v<decltype(to_tuple(test_tl))   , std::tuple<int,flo
 template<typename Z, typename F>
 struct reducer
 {
-  ---
-
   Z acc;
   F f;
 };
@@ -273,8 +298,9 @@ struct reducer
 template<typename... T, typename F, typename Z>
 constexpr auto reduce(type_list<T...>, F f, Z z)
 { 
-  ---
+    return (f(z, type_list<T>{}) + ...);
 }
+
 
 static_assert
 (
