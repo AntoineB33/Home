@@ -16,7 +16,7 @@ class MainController:
         self.app = QApplication(sys.argv)
         self.storage = TableStorage(collection_filename)
         self.model = InfiniteTableModel(self.storage)
-        self.view = SpreadsheetView()
+        self.view = SpreadsheetView(self.model)
         self.view.setModel(self.model)
         self.floating_panel = FloatingButtonPanel(self.view, self.model)
         self._position_floating_panel()
