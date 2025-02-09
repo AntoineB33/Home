@@ -12,6 +12,8 @@ class InfiniteTableModel(QAbstractTableModel):
         self._col_count = 0
         self._used_row_count = max((row for row, col in self._storage._data.keys()), default=0) + 1
         self._used_col_count = max((col for row, col in self._storage._data.keys()), default=0) + 1
+        self._hidden_row_at_start = 0  # Number of hidden rows at the start
+        self._hidden_col_at_start = 0  # Number of hidden columns at the start
         self._column_colors = {}  # Store column background colors
 
     def rowCount(self, parent=QModelIndex()):
@@ -55,7 +57,7 @@ class InfiniteTableModel(QAbstractTableModel):
 
     def adjust_row_count(self, visible_rows):
         """Adjust row count based on visible area."""
-        self._row_count = max(self._used_row_count, visible_rows)
+        self._row_count = max(self._used_row_count, visible_rows + self._hidden_row_at_start)
         self.beginResetModel()
         self.endResetModel()
     
