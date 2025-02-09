@@ -39,8 +39,8 @@ class SpreadsheetView(QTableView):
         visible_rows = self.viewport().height() // row_height + 1
         visible_cols = self.viewport().width() // col_width + 1
 
-        self.controller.adjust_rows_count(visible_rows)
-        self.controller.adjust_columns_count(visible_cols)
+        self.controller.adjust_row_count(visible_rows)
+        self.controller.adjust_col_count(visible_cols)
 
     def handle_vertical_scroll(self, value):
         """

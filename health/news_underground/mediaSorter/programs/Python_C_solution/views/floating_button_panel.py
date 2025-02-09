@@ -1,15 +1,16 @@
 from PyQt5.QtWidgets import QWidget, QPushButton, QHBoxLayout, QComboBox
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QColor
+from controllers.floating_button_controller import FloatingButtonController  # Import the controller
 
 class FloatingButtonPanel(QWidget):
     """
     A floating panel that contains buttons and a drop-down menu.
     The drop-down menu changes the color of the first cell in the current column.
     """
-    def __init__(self, parent, model, *args, **kwargs):
+    def __init__(self, parent, controller, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
-        self.model = model  # Store reference to the table model
+        self.controller = controller  # Store reference to the controller
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setWindowFlags(Qt.SubWindow)
         self.setStyleSheet("background-color: lightgray; border: 1px solid black;")
@@ -27,7 +28,7 @@ class FloatingButtonPanel(QWidget):
         self.dropdown.addItem("conditions", QColor(Qt.white))
         self.dropdown.addItem("tags", QColor(Qt.cyan))
         self.dropdown.addItem("name", QColor(Qt.yellow))
-        self.dropdown.currentIndexChanged.connect(self.change_column_color)
+        self.dropdown.currentIndexChanged.connect(self.on_color_selected)
 
         # Layout with padding
         layout = QHBoxLayout(self)
@@ -40,8 +41,8 @@ class FloatingButtonPanel(QWidget):
         self.setLayout(layout)
         self.adjustSize()
 
-    def change_column_color(self):
-        """Change the background color of the first cell in the current column."""
+    def on_color_selected(self):
+        """Notify the controller when the user selects a color."""
         table = self.parent()
         if not table or not table.selectionModel():
             return
@@ -50,13 +51,12 @@ class FloatingButtonPanel(QWidget):
         if not selected_indexes:
             return
 
-        # Get the column of the first selected cell
-        current_index = selected_indexes[0]  # Get the first selected index
-        current_column = current_index.column()  # Column of the active selected cell
-        selected_color = self.dropdown.currentData()
+        current_index = selected_indexes[0]  # Get the first selected cell
+        current_column = current_index.column()  # Column of the selected cell
+        selected_color = self.dropdown.currentData()  # Get the selected color
 
-        # Update the model (this triggers persistence)
-        self.model.set_column_color(current_column, selected_color)
+        # Notify the Controller instead of modifying the Model directly
+        self.controller.change_column_color(current_column, selected_color)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:

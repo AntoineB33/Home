@@ -63,7 +63,7 @@ class InfiniteTableModel(QAbstractTableModel):
         """Adjust column count based on visible area."""
         self._col_count = max(self._used_col_count, visible_cols)
         self.beginResetModel()
-        self.endReset
+        self.endResetModel()
 
     def expand_rows(self, new_count):
         """Expand row count if needed."""

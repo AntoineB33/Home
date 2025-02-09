@@ -18,7 +18,7 @@ class MainController:
         self.model = InfiniteTableModel(self.storage)
         self.view = SpreadsheetView(self)
         self.view.setModel(self.model)
-        self.floating_panel = FloatingButtonPanel(self.view, self.model)
+        self.floating_panel = FloatingButtonPanel(self.view, self)
         self._position_floating_panel()
 
     def _position_floating_panel(self):
@@ -29,13 +29,16 @@ class MainController:
         init_y = 0
         self.floating_panel.move(init_x, init_y)
         self.floating_panel.show()
+    
+    def get_model(self):
+        return self.model
 
     def run(self):
         self.view.show()
         return self.app.exec_()
 
-    def adjust_rows_count(self, visible_rows):
+    def adjust_row_count(self, visible_rows):
         self.model.adjust_row_count(visible_rows)
     
-    def adjust_columns_count(self, visible_columns):
-        self.model.adjust_column_count(visible_columns)
+    def adjust_col_count(self, visible_columns):
+        self.model.adjust_col_count(visible_columns)
