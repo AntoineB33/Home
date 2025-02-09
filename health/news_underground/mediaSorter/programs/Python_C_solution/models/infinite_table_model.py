@@ -8,8 +8,10 @@ class InfiniteTableModel(QAbstractTableModel):
     def __init__(self, storage, parent=None):
         super().__init__(parent)
         self._storage = storage
-        self._row_count = 20  # Start small (only visible rows)
-        self._col_count = 10  # Start small (only visible columns)
+        self._row_count = 0
+        self._col_count = 0
+        self._used_row_count = max((row for row, col in self._storage._data.keys()), default=0) + 1
+        self._used_col_count = max((col for row, col in self._storage._data.keys()), default=0) + 1
         self._column_colors = {}  # Store column background colors
 
     def rowCount(self, parent=QModelIndex()):
@@ -35,6 +37,12 @@ class InfiniteTableModel(QAbstractTableModel):
     def setData(self, index, value, role=Qt.EditRole):
         if index.isValid() and role == Qt.EditRole:
             self._storage.set_value(index.row(), index.column(), value)
+            if value:
+                self._used_row_count = max(self._used_row_count, index.row() + 1)
+                self._used_col_count = max(self._used_col_count, index.column() + 1)
+            else:
+                self._used_row_count = max((row for row, col in self._storage._data.keys()), default=0) + 1
+                self._used_col_count = max((col for row, col in self._storage._data.keys()), default=0) + 1
             self.dataChanged.emit(index, index, [Qt.DisplayRole, Qt.EditRole])
             return True
         return False
@@ -44,6 +52,18 @@ class InfiniteTableModel(QAbstractTableModel):
         self._column_colors[col] = color
         index = self.index(0, col)  # First row, specified column
         self.dataChanged.emit(index, index, [Qt.BackgroundRole])
+
+    def adjust_row_count(self, visible_rows):
+        """Adjust row count based on visible area."""
+        self._row_count = max(self._used_row_count, visible_rows)
+        self.beginResetModel()
+        self.endResetModel()
+    
+    def adjust_col_count(self, visible_cols):
+        """Adjust column count based on visible area."""
+        self._col_count = max(self._used_col_count, visible_cols)
+        self.beginResetModel()
+        self.endReset
 
     def expand_rows(self, new_count):
         """Expand row count if needed."""
@@ -62,7 +82,7 @@ class InfiniteTableModel(QAbstractTableModel):
     def shrink_rows(self):
         """Shrink rows if all cells in the extra rows are empty."""
         last_filled_row = max((row for row, col in self._storage._data.keys()), default=0)
-        new_count = max(20, last_filled_row + 1)  # Keep at least 20 rows
+        new_count = last_filled_row + 2  # Keep at least 20 rows
         if new_count < self._row_count:
             self.beginResetModel()
             self._row_count = new_count
@@ -71,7 +91,7 @@ class InfiniteTableModel(QAbstractTableModel):
     def shrink_columns(self):
         """Shrink columns if all cells in the extra columns are empty."""
         last_filled_col = max((col for row, col in self._storage._data.keys()), default=0)
-        new_count = max(10, last_filled_col + 1)  # Keep at least 10 columns
+        new_count = last_filled_col + 2  # Keep at least 10 columns
         if new_count < self._col_count:
             self.beginResetModel()
             self._col_count = new_count

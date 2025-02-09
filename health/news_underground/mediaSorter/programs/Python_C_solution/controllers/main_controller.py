@@ -16,7 +16,7 @@ class MainController:
         self.app = QApplication(sys.argv)
         self.storage = TableStorage(collection_filename)
         self.model = InfiniteTableModel(self.storage)
-        self.view = SpreadsheetView(self.model)
+        self.view = SpreadsheetView(self)
         self.view.setModel(self.model)
         self.floating_panel = FloatingButtonPanel(self.view, self.model)
         self._position_floating_panel()
@@ -33,3 +33,9 @@ class MainController:
     def run(self):
         self.view.show()
         return self.app.exec_()
+
+    def adjust_rows_count(self, visible_rows):
+        self.model.adjust_row_count(visible_rows)
+    
+    def adjust_columns_count(self, visible_columns):
+        self.model.adjust_column_count(visible_columns)
