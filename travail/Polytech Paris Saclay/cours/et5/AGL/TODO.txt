@@ -1,0 +1,5 @@
+logo connection inscription
+messages déchets
+appbar du classement
+quiz avec backend
+flouter l'image d'accueil
