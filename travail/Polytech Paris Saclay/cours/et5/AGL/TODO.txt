@@ -1,5 +1,4 @@
 logo connection inscription
-messages déchets
+messages déchets -ok
 appbar du classement
-quiz avec backend
-flouter l'image d'accueil
+quiz avec backend -ok

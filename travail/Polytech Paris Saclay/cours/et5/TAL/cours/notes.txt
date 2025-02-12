@@ -1,0 +1,116 @@
+paramètres : poids
+hyper-paramètres : learning rate, nbre de couches cachées, epoch, optimisation (Adam, SGD...), nbre d'unités
+
+dataset DOCReD : Extraction de relations
+CoNULL : Extraction d'ENs
+=> Optimisation des huper-paramètres
+    OPTUNA
+
+
+
+w1  Label1
+w2  Label2
+w3  Label3
+
+dataset bien distribuée
+
+
+
+Nord2vec
+-statique
+
+corpus
+
+
+
+
+
+Model
+1) Perceptron   1950
+2) MSP: MultiLayer Perceptron   1970
+3) FeedForward      1980
+4) RNNs     2080
+    LSTM
+    GRU
+5) Tranformé     2017
+
+
+
+
+
+
+Explicabilité
+LLMs
+    Langue (News)
+    Domaine (Médical...)
+
+
+
+
+corpus comparable
+corpus parallèle
+
+
+
+langues aglutinées : espagnol ou allemand
+
+
+LIMA (base de règles)
+
+
+
+
+stages :
+https://www.atala.org/
+
+
+
+
+
+fine-tuning : pour bcp d'exemples
+classifier (comme BERT) : pour moins d'exemples
+
+
+
+
+
+
+
+
+
+projet:
+2-3 M de textes traduits
+
+
+
+pour le projet:
+moses:
+modèle d'évaluation et de transcription
+
+
+
+
+
+
+plongement lexicaux : réels
+
+
+
+mécanisme d'alignement (plus révolutionnaire pour les modèles neuronaux) :
+
+BERT :
+position-encoder
+mécanisme d'attention
+
+
+
+WE :
+1- statiques
+word2vec
+fastText
+Glove
+2- dynamique
+BERT (prend pas en compte le contexte (les mots à droites et à gauche))
+ELMO
+Roberta
+Camembert

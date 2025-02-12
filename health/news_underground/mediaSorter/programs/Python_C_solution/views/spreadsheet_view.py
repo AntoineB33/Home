@@ -16,9 +16,6 @@ class SpreadsheetView(QTableView):
         self.verticalScrollBar().valueChanged.connect(self.handle_vertical_scroll)
         self.horizontalScrollBar().valueChanged.connect(self.handle_horizontal_scroll)
 
-        self.prev_vertical_scroll = None
-        self.prev_horizontal_scroll = None
-
     def resizeEvent(self, event):
         """
         Adjust the number of computed rows/columns based on window size.
@@ -63,7 +60,9 @@ class SpreadsheetView(QTableView):
 
 
     def handle_vertical_scroll(self, value):
-        print(self.get_last_visible_row())
+        if value == self.verticalScrollBar().maximum():
+            self.controller.load_more_rows()
+        else:
     
     def handle_horizontal_scroll(self, value):
         """

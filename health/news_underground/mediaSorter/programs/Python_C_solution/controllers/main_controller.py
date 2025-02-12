@@ -37,6 +37,9 @@ class MainController:
         self.view.show()
         return self.app.exec_()
 
+    def load_more_rows(self):
+        self.model.load_more_rows()
+
     def adjust_row_count(self, visible_rows):
         self.model.adjust_row_count(visible_rows)
     

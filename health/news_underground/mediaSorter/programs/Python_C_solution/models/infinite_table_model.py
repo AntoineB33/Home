@@ -54,6 +54,11 @@ class InfiniteTableModel(QAbstractTableModel):
         self._column_colors[col] = color
         index = self.index(0, col)  # First row, specified column
         self.dataChanged.emit(index, index, [Qt.BackgroundRole])
+    
+    def load_more_rows(self):
+        self.beginResetModel()
+        self._row_count += 1
+        self.endResetModel()
 
     def adjust_row_count(self, visible_rows):
         """Adjust row count based on visible area."""
