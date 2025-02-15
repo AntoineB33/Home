@@ -39,9 +39,12 @@ class MainController:
 
     def load_more_rows(self):
         self.model.load_more_rows()
-
-    def adjust_row_count(self, visible_rows):
-        self.model.adjust_row_count(visible_rows)
     
-    def adjust_col_count(self, visible_columns):
-        self.model.adjust_col_count(visible_columns)
+    def load_more_cols(self):
+        self.model.load_more_cols()
+
+    def load_less_rows(self, last_visible_row):
+        self.model.load_less_rows(last_visible_row)
+    
+    def load_less_cols(self, last_visible_col):
+        self.model.load_less_cols(last_visible_col)

@@ -8,10 +8,10 @@ class InfiniteTableModel(QAbstractTableModel):
     def __init__(self, storage, parent=None):
         super().__init__(parent)
         self._storage = storage
-        self._row_count = 0
-        self._col_count = 0
         self._used_row_count = max((row for row, col in self._storage._data.keys()), default=0) + 1
         self._used_col_count = max((col for row, col in self._storage._data.keys()), default=0) + 1
+        self._row_count = self._used_row_count
+        self._col_count = self._used_col_count
         self._hidden_row_at_start = 0  # Number of hidden rows at the start
         self._hidden_col_at_start = 0  # Number of hidden columns at the start
         self._column_colors = {}  # Store column background colors
@@ -59,50 +59,25 @@ class InfiniteTableModel(QAbstractTableModel):
         self.beginResetModel()
         self._row_count += 1
         self.endResetModel()
-
-    def adjust_row_count(self, visible_rows):
-        """Adjust row count based on visible area."""
-        self._row_count = max(self._used_row_count, visible_rows + self._hidden_row_at_start)
+    
+    def load_more_cols(self):
         self.beginResetModel()
+        self._col_count += 1
         self.endResetModel()
     
-    def adjust_col_count(self, visible_cols):
-        """Adjust column count based on visible area."""
-        self._col_count = max(self._used_col_count, visible_cols)
+    def load_less_rows(self, last_visible_row):
+        if last_visible_row >= self._row_count - 1:
+            return
         self.beginResetModel()
+        self._row_count = max(last_visible_row + 1, self._used_row_count)
         self.endResetModel()
-
-    def expand_rows(self, new_count):
-        """Expand row count if needed."""
-        if new_count > self._row_count:
-            self.beginResetModel()
-            self._row_count = new_count
-            self.endResetModel()
-
-    def expand_columns(self, new_count):
-        """Expand column count if needed."""
-        if new_count > self._col_count:
-            self.beginResetModel()
-            self._col_count = new_count
-            self.endResetModel()
-
-    def shrink_rows(self):
-        """Shrink rows if all cells in the extra rows are empty."""
-        last_filled_row = max((row for row, col in self._storage._data.keys()), default=0)
-        new_count = last_filled_row + 2  # Keep at least 20 rows
-        if new_count < self._row_count:
-            self.beginResetModel()
-            self._row_count = new_count
-            self.endResetModel()
-
-    def shrink_columns(self):
-        """Shrink columns if all cells in the extra columns are empty."""
-        last_filled_col = max((col for row, col in self._storage._data.keys()), default=0)
-        new_count = last_filled_col + 2  # Keep at least 10 columns
-        if new_count < self._col_count:
-            self.beginResetModel()
-            self._col_count = new_count
-            self.endResetModel()
+    
+    def load_less_cols(self, last_visible_col):
+        if last_visible_col >= self._col_count - 1:
+            return
+        self.beginResetModel()
+        self._col_count = max(last_visible_col + 1, self._used_col_count)
+        self.endResetModel()
 
     def flags(self, index):
         if not index.isValid():
