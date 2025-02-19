@@ -42,24 +42,32 @@ class SpreadsheetView(QTableView):
         # Make frozen view ignore mouse events
         self.frozen_row_view.setAttribute(Qt.WA_TransparentForMouseEvents)
         
+        # Ensure column widths match initially
+        self.sync_frozen_column_widths()
+        
         # Initial geometry update
         self.update_frozen_view_geometry()
         
         # Update when row 0 is resized
         self.verticalHeader().sectionResized.connect(self.on_row_resized)
 
-        # Ensure column widths match initially
+    def sync_frozen_column_widths(self):
+        """Ensure frozen row column widths match main table."""
         for col in range(self.model().columnCount()):
             self.frozen_row_view.setColumnWidth(col, self.columnWidth(col))
+
 
     def update_frozen_view_geometry(self):
         if self.model().rowCount() == 0:
             self.frozen_row_view.hide()
             return
-        # Position below horizontal header and match viewport width
+
         hheader_height = self.horizontalHeader().height()
-        self.frozen_row_view.move(self.frameWidth(), hheader_height)  # Ensure left alignment
+        vheader_width = self.verticalHeader().width()  # Get the width of the row numeration
+        self.frozen_row_view.move(vheader_width, hheader_height)  # Align properly
+        
         self.frozen_row_view.setFixedWidth(self.viewport().width())
+        
         # Set height to row 0's height
         row0_height = self.rowHeight(0)
         self.frozen_row_view.setFixedHeight(row0_height)
@@ -70,9 +78,10 @@ class SpreadsheetView(QTableView):
         self.adjust_row_count(self.verticalScrollBar().value())
         self.adjust_col_count(self.horizontalScrollBar().value())
 
-        # Ensure column widths match
-        for col in range(self.model().columnCount()):
-            self.frozen_row_view.setColumnWidth(col, self.columnWidth(col))
+        # Ensure frozen row aligns with main table's data area
+        self.sync_frozen_column_widths()
+        self.update_frozen_view_geometry()
+
 
     def on_row_resized(self, row, old_height, new_height):
         if row == 0:
@@ -80,7 +89,9 @@ class SpreadsheetView(QTableView):
             self.update_frozen_view_geometry()
 
     def update_frozen_column_width(self, logical_index, old_size, new_size):
-        self.frozen_row_view.horizontalHeader().resizeSection(logical_index, new_size)
+        """Ensure that when a column is resized in the main table, it resizes in the frozen row view too."""
+        self.frozen_row_view.setColumnWidth(logical_index, new_size)
+
 
     def handle_vertical_scroll(self, value):
         self.adjust_row_count(value)
