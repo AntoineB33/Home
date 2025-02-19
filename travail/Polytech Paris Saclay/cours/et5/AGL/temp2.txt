@@ -1,0 +1,101 @@
+import 'package:project_kaulab/app_localization.dart';
+import 'package:project_kaulab/screens/MaintenancePage.dart';
+
+import '../index.dart';
+import '../screens/profile/ProfilePage.dart';
+import '../screens/LeaderboardPage.dart';
+
+class GuestNavBar extends NavBar {
+  final GuestUserView userView;
+
+  GuestNavBar(BuildContext context, this.userView, {int initialIndex = 0})
+      : super(
+          items: [
+            _buildNavItem(
+              icon: Icons.person_add_alt_1,
+              label: AppLocalizations.of(context).translate("Subscribe"),
+              index: 0,
+            ),
+            _buildNavItem(
+              icon: Icons.home,
+              label: AppLocalizations.of(context).translate("List"),
+              index: 1,
+            ),
+            _buildNavItem(
+              icon: Icons.person_outline,
+              label: AppLocalizations.of(context).translate("to connect"),
+              index: 2,
+            ),
+          ],
+          selectedIndex: initialIndex,
+        );
+
+  @override
+  State<GuestNavBar> createState() => _GuestNavBarState();
+
+  static BottomNavigationBarItem _buildNavItem({
+    IconData? icon,
+    String? imagePath,
+    required String label,
+    required int index,
+  }) {
+    return BottomNavigationBarItem(
+      icon: Builder(
+        builder: (context) {
+          final state = context.findAncestorStateOfType<_GuestNavBarState>();
+          final bool isSelected = state?.selectedIndex == index; // Use selectedIndex getter
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 30,
+                width: 51,
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.white : Colors.transparent,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                padding: EdgeInsets.all(4),
+                child: icon != null
+                    ? Icon(
+                        icon,
+                        color: isSelected ? Color(0xFFF04D48) : Colors.white,
+                        size: 24,
+                      )
+                    : Image.asset(
+                        imagePath!,
+                        color: isSelected ? Color(0xFFF04D48) : Colors.white,
+                        width: 24,
+                        height: 24,
+                      ),
+              ),
+            ],
+          );
+        },
+      ),
+      label: label,
+    );
+  }
+}
+
+class _GuestNavBarState extends NavBarState<GuestNavBar> {
+  @override
+  Widget build(BuildContext context) {
+    return super.build(context);
+  }
+  @override
+  void onItemTapped(int index) {
+    super.onItemTapped(index);
+    switch (index) {
+      case 0:
+        widget.userView.changeView(context, Registration(userView: widget.userView));
+        break;
+      case 1:
+        widget.userView.changeView(context, GuestHome(userView: widget.userView));
+        break;
+      case 2:
+        widget.userView.changeView(context, Connection(userView: widget.userView));
+        break;
+    }
+  }
+}

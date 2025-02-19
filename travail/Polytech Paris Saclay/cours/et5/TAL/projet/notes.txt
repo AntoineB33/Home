@@ -1,1 +1,45 @@
 head -100000 europarl.txt > europarl_100k.txt
+
+
+
+
+
+
+
+
+environement openNMP
+gensim
+numpy
+
+
+2e sujet : faire git clone
+
+8 Go en tout (sans dataset, entrainement du modèle)
+
+
+
+pour exo 2 :
+2) utiliser corpus en forme fléchie (tels qu'on les récupère sur le site, directement sur OPUS (version tokenisée du corpus récupéré de la base OPUS))
+
+3) corpus en lemmes (substantif au singulier, verbe à l'infinitif...)
+ pour lemmatiser    NLTK :  EN: WordNet Lemmatizer
+                            FR: French Leff Lemmatizer
+
+                            => Faire un POS tagging avant la lemmatisation (dans le NLTK)
+                            sinon :
+                            président =>    NOM: président 
+                                            VERBE: présider
+                            sinon NLTK a tout le reste
+                    
+                    ou
+                    spacey : lemmatise directement
+ por lemmatiser vous pouvez utiliser Spacy
+
+ pour les plus motivés : faire les deux (tout le M dit que Spacy est meilleur, peut-on le prouver?)
+ comparaison : faire juste un diff entre les deux
+
+
+
+
+
+ 1er étape : installer
