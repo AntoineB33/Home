@@ -1,8 +1,5 @@
-/**
-!code_tips/
-!code_tips/**
-!debug/
-!debug/**
-!data_management/
-!data_management/**
-!.gitignore
+video/**
+ScreenRuler-v.0.10.0-Portable/**
+computer/**
+chg_clipboard/**
+virtual machine/**

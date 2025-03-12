@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppInstaller
+	Uri="file:///C:/Users/abarb/source/repos/App2/App2/bin/x64/Release/net8.0-windows10.0.26100.0/win-x64/AppPackages/App2_x64.appinstaller"
+	Version="1.0.6.0" xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2">
+	<MainPackage
+		Name="a6714fbe-7044-42de-b8ab-099055a0b3b2"
+		Version="1.0.6.0"
+		Publisher="CN=abarb"
+		Uri="file:///C:/Users/abarb/source/repos/App2/App2/bin/x64/Release/net8.0-windows10.0.26100.0/win-x64/AppPackages/App2_1.0.6.0_x64_Test/App2_1.0.6.0_x64.msix"
+		ProcessorArchitecture="x64" />
+	<Dependencies>
+		<Package
+			Name="Microsoft.WindowsAppRuntime.1.6"
+			Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US"
+			ProcessorArchitecture="x64"
+			Uri="file:///C:/Users/abarb/source/repos/App2/App2/bin/x64/Release/net8.0-windows10.0.26100.0/win-x64/AppPackages/App2_1.0.6.0_x64_Test/Dependencies/x64/Microsoft.WindowsAppRuntime.1.6.msix"
+			Version="6000.266.2241.0" />
+	</Dependencies>
+	<UpdateSettings>
+		<OnLaunch
+			HoursBetweenUpdateChecks="672" />
+	</UpdateSettings>
+</AppInstaller>

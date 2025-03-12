@@ -1,0 +1,128 @@
+requirements.txt :
+le fichier : pipreqs . --force
+les librairies : python -m pip install -r requirements.txt
+
+
+untrack files from remote repo : 
+git rm -r --cached .
+git add .
+
+	if it didn't work :
+	Remove-Item -Force .git\index.lock
+
+overwrite current branch with your-branch :
+git reset --hard your-branch
+
+check if a directory is ignored :
+git check-ignore -v your-directory
+
+get repo URL :
+git remote -v
+
+print content :
+more file.txt
+
+
+
+
+
+Here’s a list of **important Windows terminal commands** (for **Command Prompt (cmd)** and **PowerShell**) that are useful for everyday tasks, troubleshooting, and system management.
+
+---
+
+### 📂 **File and Directory Management**
+| Command                          | Description                         |
+|-----------------------------------|-------------------------------------|
+| `dir`                             | Lists files and directories.        |
+| `cd [folder]`                     | Changes directory.                  |
+| `cd ..`                           | Moves up one directory.             |
+| `mkdir [folder]`                  | Creates a new directory.            |
+| `rmdir [folder] /s /q`            | Deletes a folder (with contents).   |
+| `del [filename]`                  | Deletes a file.                     |
+| `ren [old] [new]`                 | Renames a file or folder.           |
+| `copy [source] [destination]`     | Copies a file.                      |
+| `move [source] [destination]`     | Moves/renames files or directories. |
+
+---
+
+### 🔎 **System Information and Processes**
+| Command                    | Description                             |
+|-----------------------------|-----------------------------------------|
+| `systeminfo`                | Displays detailed system information.   |
+| `tasklist`                  | Shows running processes.                |
+| `taskkill /IM [name.exe]`   | Stops a process by name.                |
+| `ipconfig`                  | Shows IP address and network info.      |
+| `ipconfig /flushdns`        | Clears the DNS cache.                   |
+| `ping [address]`            | Tests network connectivity.             |
+| `tracert [address]`         | Traces the route to a network address.  |
+| `netstat -an`               | Displays active network connections.    |
+| `powercfg /batteryreport`   | Generates a battery health report.      |
+
+---
+
+### 🛠️ **System Maintenance and Troubleshooting**
+| Command                      | Description                              |
+|-------------------------------|------------------------------------------|
+| `sfc /scannow`                | Scans and repairs system files.          |
+| `chkdsk [drive:] /f`          | Checks and fixes disk errors.            |
+| `DISM /Online /Cleanup-Image` | Repairs Windows image.                   |
+| `shutdown /s /t 0`            | Shuts down the computer immediately.     |
+| `shutdown /r /t 0`            | Restarts the computer immediately.       |
+| `diskpart`                    | Opens disk partition manager (advanced). |
+| `wmic logicaldisk get name`   | Lists all drives and partitions.         |
+
+---
+
+### 🔐 **User and Permissions Management**
+| Command                       | Description                              |
+|--------------------------------|------------------------------------------|
+| `whoami`                      | Displays current user.                   |
+| `net user`                    | Lists all user accounts.                 |
+| `net user [username] [pass]`  | Changes a user’s password.               |
+| `runas /user:[user] cmd`      | Runs a command as another user.          |
+| `gpupdate /force`             | Forces group policy updates.             |
+
+---
+
+### 📊 **File Compression and Archiving**
+| Command                         | Description                             |
+|----------------------------------|-----------------------------------------|
+| `compact /c [filename]`         | Compresses a file or directory.         |
+| `tar -cf archive.tar [files]`   | Creates a `.tar` archive.               |
+| `tar -xf archive.tar`           | Extracts a `.tar` archive.              |
+
+---
+
+### 🧰 **Windows Package Manager (PowerShell)**
+| Command                        | Description                             |
+|---------------------------------|-----------------------------------------|
+| `winget search [app]`          | Searches for a package.                 |
+| `winget install [app]`         | Installs an app.                        |
+| `winget uninstall [app]`       | Uninstalls an app.                      |
+| `winget list`                  | Lists installed packages.               |
+
+---
+
+### 📜 **Advanced PowerShell Commands**
+| Command                          | Description                             |
+|-----------------------------------|-----------------------------------------|
+| `Get-Process`                     | Lists active processes.                 |
+| `Get-Service`                     | Lists all services.                     |
+| `Stop-Service [name]`             | Stops a service.                        |
+| `Start-Service [name]`            | Starts a service.                       |
+| `Get-EventLog -LogName System`    | Displays system logs.                   |
+| `Set-ExecutionPolicy RemoteSigned`| Allows local script execution.          |
+
+---
+
+### 🔍 **Search and Output Control**
+| Command                     | Description                             |
+|------------------------------|-----------------------------------------|
+| `| more`                    | Displays output one screen at a time.   |
+| `> [file.txt]`              | Redirects output to a file.             |
+| `>> [file.txt]`             | Appends output to a file.               |
+| `findstr [text] [file]`     | Searches for text in a file.            |
+
+---
+
+Would you like explanations on any specific commands or additional advanced tasks? 💻
