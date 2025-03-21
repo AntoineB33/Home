@@ -130,10 +130,13 @@ def main():
     # Generate code summaries
     output.append("\n\nCode Summaries:\n")
     for py_file in project_root.glob("**/*.py"):
-        if "__pycache__" in str(py_file):
+        if any(part in EXCLUDE_DIRS for part in py_file.parts):
             continue
         output.append(parse_py_file(py_file))
+    
     for qml_file in project_root.glob("**/*.qml"):
+        if any(part in EXCLUDE_DIRS for part in qml_file.parts):
+            continue
         output.append(parse_qml_file(qml_file))
 
     # Write to file
