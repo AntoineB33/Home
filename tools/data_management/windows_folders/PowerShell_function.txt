@@ -38,4 +38,4 @@ function Show-Tree {
 }
 
 # Run the function with the desired path and depth
-Show-Tree -Path "C:\Users\abarb\Documents\health\news_underground\mediaSorter\programs\Python_C_solution" -Depth 2
+Show-Tree -Path "C:\Users\abarb\Documents\health\entertainment\news_underground\mediaSorter\programs\Python_C_solution" -Depth 2

@@ -1,0 +1,47 @@
+Python_C_solution/
+    requirements.txt
+    spreadsheet.json
+    src/
+        main.py
+          def main():
+        __init__.py
+        models/
+            spreadsheet_model.py
+              class SpreadsheetModel(QAbstractTableModel):
+              def __init__(self, parent=None):
+              def rowCount(self, parent=None):
+              def columnCount(self, parent=None):
+              def data(self, index, role=Qt.DisplayRole):
+              def setData(self, index, value, role=Qt.EditRole):
+              @Slot(int)
+    def addRows(self, count):
+              @Slot(int)
+    def addColumns(self, count):
+              @Slot(int)
+    def setRows(self, count):
+              @Slot(int)
+    def setColumns(self, count):
+              @Slot(result=int)
+    def getMaxRow(self):
+              @Slot(result=int)
+    def getMaxColumn(self):
+              def roleNames(self):
+              def save_to_file(self, filename="spreadsheet.json"):
+              def load_from_file(self, filename="spreadsheet.json"):
+            __init__.py
+            __pycache__/
+                spreadsheet_model.cpython-313.pyc
+                __init__.cpython-313.pyc
+        qml/
+            main.qml
+              Root element: Window
+              Properties: width, height, visible, title, model, clip, propagateComposedEvents, policy
+              Children: width, height, visible, title, TableView, id, anchors, model, clip, property, Component, const, spreadsheetModel, console, MouseArea, propagateComposedEvents, onWheel, if, horizontalScrollbar, Math, wheel, ScrollBar, policy, onPositionChanged, if, var, if
+            resources.qrc
+            components/
+                CellDelegate.qml
+                  Root element: Rectangle
+                  Properties: implicitWidth, implicitHeight, text
+                  Children: implicitWidth, implicitHeight, border, TextInput, anchors, text, onEditingFinished, console, var, if
+    tests/
+        __init__.py
